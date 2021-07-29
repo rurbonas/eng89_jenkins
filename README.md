@@ -51,3 +51,37 @@ ssh-keygen -t ed25519 -C "your_email@example.com"
 npm install
 npm test`
 - Build and check if running
+
+# Jenkins Pipeline with GitHub
+### Create a web-hook for Jenkins
+
+- Copy Jenkins IP address from URL
+- Go to GitHub >> Repo Settings >> webhooks >> add webhook >> Payload URL `http://[JENKINSIP:PORT]/github-webhook/`
+
+### Git Publisher
+- Add Post-build Actions to previous item and connect to:
+
+- New Freestyle Project >> `name_merge`
+- Discard old builds >> Max # of builds to keep	>> 3
+- GitHub project >> `https://github.com/rurbonas/eng89_multi_server_automation.git`
+- Office 365 Connector >> Restrict where this project can be run >> choose `test-ubuntu-node`
+- Source Code Management >> Git >> `git@github.com:rurbonas/eng89_multi_server_automation.git`
+- Add Credentials
+- Branches to build >> `*/dev`
+- Additional Behaviours
+```
+Name of repository >> origin
+Branch to merge to >> main
+Merge strategy >> default
+Fast-forward mode >> --ff
+```
+- Build >> add build step >> Execute Shell
+```
+git checkout main
+git merge origin/dev
+```
+- Post-build Actions >> Push Only If Build Succeeds >> Branches >> 
+```
+Branch to push >> main
+Target remote name >> origin
+```
