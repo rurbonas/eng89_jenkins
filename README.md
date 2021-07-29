@@ -1,13 +1,7 @@
 # Automating with Jenkins
 ![](Diagram2.png)
 
-### Generating new private/public keys
-```python
-ssh-keygen -t ed25519 -C "your_email@example.com"
-```
 
-adding keys to github (work in progress)
-...
 
 ### Create Jenkins pipeline
 
@@ -33,4 +27,27 @@ Actions
 - Finished: SUCCESS
 
 
-
+### Generating new private/public keys and connect to Jenkins and EC2
+```python
+ssh-keygen -t ed25519 -C "your_email@example.com"
+```
+- Copy public key from .ssh folder >> `cat keyname.pub`
+- In the repo >> Settings >> Deploy keys >> Add key
+- Paste public key
+- New Freestyle Project
+- GitHub project >> `https://github.com/rurbonas/eng89_multi_server_automation.git`
+- Office 365 Connector >> Restrict where this project can be run >> choose `test-ubuntu-node`
+- Source Code Management >> Git >> `git@github.com:rurbonas/eng89_multi_server_automation.git`
+- Add new Credentials >> Jenkins
+- Kind >> SSH Username with private key
+- Private Key >> Enter directly >> Add
+- Copy private key from .ssh folder >> `cat keyname`
+- paste in Jenkins key
+- Branches to build >> Branch Specifier (blank for 'any') >> `*/main`
+- Build Triggers >> GitHub hook trigger for GITScm polling
+- Build Environment >> Provide Node & npm bin/ folder to PATH
+- Build >> add build step >> Execute Shell
+- `cd app
+npm install
+npm test`
+- Build and check if running
